@@ -1,8 +1,9 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, text, div, h1, img)
-import Html.Attributes exposing (src)
+import Html exposing (Html, div, h1, img, text)
+import Html.Attributes exposing (class, src)
+
 
 
 ---- MODEL ----
@@ -12,9 +13,9 @@ type alias Model =
     {}
 
 
-init : ( Model, Cmd Msg )
+init : Model
 init =
-    ( {}, Cmd.none )
+    {}
 
 
 
@@ -25,9 +26,9 @@ type Msg
     = NoOp
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> Model
 update msg model =
-    ( model, Cmd.none )
+    model
 
 
 
@@ -36,9 +37,8 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ img [ src "/logo.svg" ] []
-        , h1 [] [ text "Your Elm App is working!" ]
+    div [ class "container" ]
+        [ h1 [] [ text "Elm Unit converter" ]
         ]
 
 
@@ -48,9 +48,8 @@ view model =
 
 main : Program () Model Msg
 main =
-    Browser.element
-        { view = view
-        , init = \_ -> init
+    Browser.sandbox
+        {init = init
+        , view = view
         , update = update
-        , subscriptions = always Sub.none
         }
