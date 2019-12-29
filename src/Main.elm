@@ -1,9 +1,10 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, button, div, h1, h2, h3, img, input, label, p, text)
-import Html.Attributes exposing (class, src, style, type_)
+import Html exposing (Html, button, div, h1, h2, h3, hr, img, input, label, p, span, text)
+import Html.Attributes exposing (class, src, style, type_, value)
 import Html.Events exposing (onClick, onInput)
+import String exposing (fromFloat, toFloat)
 
 
 
@@ -20,8 +21,8 @@ type alias Model =
 init : Model
 init =
     { tempC = ""
-    , newTempC = ""
-    , tempF = ""
+    , newTempC = "0"
+    , tempF = "0"
     }
 
 
@@ -30,14 +31,31 @@ init =
 
 
 type Msg
-    = SetTemp
+    = SetTemp String
     | IncTemp
     | DecTemp
 
 
 update : Msg -> Model -> Model
 update msg model =
-    model
+    case msg of
+        SetTemp c ->
+            let
+                intTemp =
+                    case String.toFloat c of
+                        Just f ->
+                            String.fromFloat (f * 1.8 + 32)
+
+                        Nothing ->
+                            "---"
+            in
+            { model | tempC = c, tempF = intTemp }
+
+        IncTemp ->
+            model
+
+        DecTemp ->
+            model
 
 
 
@@ -50,16 +68,32 @@ view model =
         [ div [ class "container", style "margin-top" "25px" ]
             [ h1 [ class "title is-1 has-text-centered" ] [ text "Elm Unit converter" ]
             ]
-        , div [ class "columns is-centered" ]
+        , div [ class "columns is-centered", style "margin-top" "20px" ]
             [ div [ class "column box" ]
-                [ h3 [ class "title is-3 has-text-centered" ] [ text "Temperature converter" ]
-                , div [ class "has-text-centered" ]
+                [ h3 [ class "title is-3" ] [ text "Temperature converter" ]
+                , div []
                     [ label [ class "label" ] [ text "Temperature in Celsius" ]
-                    , div [ class "field " ]
-                        [ button [ class "button is-primary is-light", style "margin-right" "10px", onClick DecTemp ] [ text "-" ]
-                        , input [ type_ "text", class "input control", style "width" "50%", style "margin-right" "10px" ] []
+                    , div [ class "has-text-centered" ]
+                        [ button
+                            [ class "button is-primary is-light"
+                            , style "margin-right" "10px"
+                            , onClick DecTemp
+                            ]
+                            [ text "-" ]
+                        , input
+                            [ type_ "text"
+                            , value model.tempC
+                            , class "input control"
+                            , style "width" "50%"
+                            , style "margin-right" "10px"
+                            , onInput SetTemp
+                            ]
+                            []
                         , button [ class "button is-secondary is-light control", onClick IncTemp ] [ text "+" ]
                         ]
+                    , hr [] []
+                    , label [ class "label" ] [ text "Temperature in Farenheit" ]
+                    , p [ class "has-text-centered" ] [ text model.tempF ]
                     ]
                 ]
             , div [ class "column box" ]
