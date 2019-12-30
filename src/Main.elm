@@ -13,7 +13,6 @@ import String exposing (fromFloat, toFloat)
 
 type alias Model =
     { tempC : String
-    , newTempC : String
     , tempF : String
     }
 
@@ -21,8 +20,7 @@ type alias Model =
 init : Model
 init =
     { tempC = ""
-    , newTempC = "0"
-    , tempF = "0"
+    , tempF = "---"
     }
 
 
@@ -52,10 +50,26 @@ update msg model =
             { model | tempC = c, tempF = intTemp }
 
         IncTemp ->
-            model
+            let
+                (intF, intC) =
+                    case String.toFloat model.tempC of
+                        Just f ->
+                            (String.fromFloat ((f+1) * 1.8 + 32), String.fromFloat (f+1))
+                        Nothing ->
+                            ("---", model.tempC)
+            in
+            { model | tempC = intC, tempF = intF }
 
         DecTemp ->
-            model
+             let
+                (intF, intC) =
+                    case String.toFloat model.tempC of
+                        Just f ->
+                            (String.fromFloat ((f-1) * 1.8 + 32), String.fromFloat (f-1))
+                        Nothing ->
+                            ("---", model.tempC)
+            in
+            { model | tempC = intC, tempF = intF }
 
 
 
@@ -93,7 +107,7 @@ view model =
                         ]
                     , hr [] []
                     , label [ class "label" ] [ text "Temperature in Farenheit" ]
-                    , p [ class "has-text-centered" ] [ text model.tempF ]
+                    , p [ class "has-text-centered" ] [ text (model.tempF ++ " F") ]
                     ]
                 ]
             , div [ class "column box" ]
