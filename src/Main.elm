@@ -16,6 +16,8 @@ type alias Model =
     , tempF : String
     , lengthM : String
     , lengthF : String
+    , weightK : String
+    , weightL : String
     }
 
 
@@ -25,6 +27,8 @@ init =
     , tempF = "---"
     , lengthM = ""
     , lengthF = "---"
+    , weightK = ""
+    , weightL = "---"
     }
 
 
@@ -39,6 +43,9 @@ type Msg
     | SetLength String
     | IncLength
     | DecLength
+    | SetWeight String
+    | IncWeight
+    | DecWeight
 
 
 update : Msg -> Model -> Model
@@ -116,6 +123,42 @@ update msg model =
             in
             { model | lengthM = intC, lengthF = intF }
 
+        SetWeight c ->
+            let
+                intWeight =
+                    case String.toFloat c of
+                        Just f ->
+                            String.fromFloat (f * 2.205)
+
+                        Nothing ->
+                            "---"
+            in
+            { model | weightK = c, weightL = intWeight }
+
+        IncWeight ->
+            let
+                ( intF, intC ) =
+                    case String.toFloat model.weightK of
+                        Just f ->
+                            ( String.fromFloat ((f + 1) * 2.205), String.fromFloat (f + 1) )
+
+                        Nothing ->
+                            ( "---", model.weightK )
+            in
+            { model | weightK = intC, weightL = intF }
+
+        DecWeight ->
+            let
+                ( intF, intC ) =
+                    case String.toFloat model.weightK of
+                        Just f ->
+                            ( String.fromFloat ((f - 1) * 2.205), String.fromFloat (f - 1) )
+
+                        Nothing ->
+                            ( "---", model.weightK )
+            in
+            { model | weightK = intC, weightL = intF }
+
 
 
 ---- VIEW ----
@@ -134,7 +177,7 @@ view model =
                     [ label [ class "label" ] [ text "Temperature in Celsius" ]
                     , div [ class "has-text-centered" ]
                         [ button
-                            [ class "button is-primary is-light"
+                            [ class "button is-warning"
                             , style "margin-right" "10px"
                             , onClick DecTemp
                             ]
@@ -148,7 +191,7 @@ view model =
                             , onInput SetTemp
                             ]
                             []
-                        , button [ class "button is-secondary is-light control", onClick IncTemp ] [ text "+" ]
+                        , button [ class "button is-success", onClick IncTemp ] [ text "+" ]
                         ]
                     , hr [] []
                     , label [ class "label" ] [ text "Temperature in Farenheit" ]
@@ -161,7 +204,7 @@ view model =
                     [ label [ class "label" ] [ text "Length in meter" ]
                     , div [ class "has-text-centered" ]
                         [ button
-                            [ class "button is-primary is-light"
+                            [ class "button is-warning"
                             , style "margin-right" "10px"
                             , onClick DecLength
                             ]
@@ -175,15 +218,39 @@ view model =
                             , onInput SetLength
                             ]
                             []
-                        , button [ class "button is-secondary is-light control", onClick IncLength ] [ text "+" ]
+                        , button [ class "button is-success", onClick IncLength ] [ text "+" ]
                         ]
                     , hr [] []
                     , label [ class "label" ] [ text "Length in feet" ]
                     , p [ class "has-text-centered" ] [ text (model.lengthF ++ " ft") ]
                     ]
                 ]
-            , div [ class "column box" ]
+            , div [ class "column box", style "margin-bottom" "1.5rem" ]
                 [ h3 [ class "title is-3 has-text-centered" ] [ text "Weight converter" ]
+                , div []
+                    [ label [ class "label" ] [ text "Weight in kg" ]
+                    , div [ class "has-text-centered" ]
+                        [ button
+                            [ class "button is-warning"
+                            , style "margin-right" "10px"
+                            , onClick DecWeight
+                            ]
+                            [ text "-" ]
+                        , input
+                            [ type_ "text"
+                            , value model.weightK
+                            , class "input control"
+                            , style "width" "50%"
+                            , style "margin-right" "10px"
+                            , onInput SetWeight
+                            ]
+                            []
+                        , button [ class "button is-success", onClick IncWeight ] [ text "+" ]
+                        ]
+                    , hr [] []
+                    , label [ class "label" ] [ text "Weight in pounds" ]
+                    , p [ class "has-text-centered" ] [ text (model.weightL ++ " lbs") ]
+                    ]
                 ]
             ]
         ]
